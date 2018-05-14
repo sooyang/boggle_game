@@ -1,0 +1,59 @@
+<h1>Boggle</h1>
+
+<table align="center" id="boggle_board">
+  <% @board.each_with_index do |row, index| %>
+    <tr>
+      <td>
+        <%= row[0] %>
+        <input type="hidden" value="<%= index %>,0">
+      </td>
+      <td>
+        <%= row[1] %>
+        <input type="hidden" value="<%= index %>,1">
+      </td>
+      <td>
+        <%= row[2] %>
+        <input type="hidden" value="<%= index %>,2">
+      </td>
+      <td>
+        <%= row[3] %>
+        <input type="hidden" value="<%= index %>,3">
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<script>
+  $(document).ready(function(){
+    $('#boggle_board td').on('click', function(){
+      let selected = $(this)
+      let value = $(this).text().trim()
+      let hidden = $(this).find( ":hidden" ).val()
+      $.ajax({
+        method: "post",
+        url: "/select",
+        dataType: "json",
+        data: {value: value, index: hidden},
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        success: function(data){
+          debugger
+          if (data.word === "removed") {
+            selected.removeClass('active')
+          } else {
+            if (selected.hasClass('active')) {
+              selected.removeClass('active')
+            } else {
+              selected.addClass('active')
+            }
+          }
+        },
+        error: function(data){
+            alert("error selecting")
+          },
+        // complete: function(){
+        //   alert('successs')
+        // }
+      });
+    })
+  });
+</script>
