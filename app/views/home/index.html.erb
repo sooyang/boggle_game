@@ -23,41 +23,48 @@
   <% end %>
 </table>
 
-<p id="word">Your Word</p>
-<button id="add" type="button">Add Word</button>
+<div>
+  <p id="word">Your Word</p>
+  <button id="add" type="button">Add Word</button>
+  <button id="start" type="button">Start Game</button>
+  <button id="reset" type="button">Reset Game</button>
+</div>
 
+<div id="timer" />
 
 <script>
   $(document).ready(function(){
     $('#boggle_board td').on('click', function(){
-      let selected = $(this)
-      let value = $(this).text().trim()
-      let hidden = $(this).find( ":hidden" ).val()
-      $.ajax({
-        method: "post",
-        url: "/select",
-        dataType: "json",
-        data: {value: value, index: hidden},
-        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
-        success: function(data){
-          if (data.word === "removed") {
-            selected.removeClass('active')
-            $("#word").text(data.selected.join(""));
+      if($('#timer').data('state') === 'running') {
+        let selected = $(this)
+        let value = $(this).text().trim()
+        let hidden = $(this).find( ":hidden" ).val()
+        $.ajax({
+          method: "post",
+          url: "/select",
+          dataType: "json",
+          data: {value: value, index: hidden},
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          success: function(data){
+            if (data.word === "removed") {
+              selected.removeClass('active')
+              $("#word").text(data.selected.join(""));
 
-          } else {
-            selected.addClass('active')
-            $("#word").text(data.selected.join(""));
-          }
-        },
-        error: function(data){
+            } else {
+              selected.addClass('active')
+              $("#word").text(data.selected.join(""));
+            }
+          },
+          error: function(data){
             alert("error selecting")
           },
-        // complete: function(){
-        //   alert('successs')
-        // }
-      });
+          // complete: function(){
+          //   alert('successs')
+          // }
+        });
+      }
     })
-
+    $('#add').hide()
     $('#add').on('click', function() {
       $.ajax({
         method: "post",
@@ -74,6 +81,50 @@
         // complete: function(){
         //   alert('successs')
         // }
+      });
+    })
+
+    $('#start').on('click', function() {
+      $("#timer").timer('resume');
+      $('#add').show()
+      $('#start').hide()
+    })
+
+    $("#timer").timer({
+      countdown: true,
+      duration: '3m',
+      callback: function() {
+        alert('Time up!');
+        $('#start').show()
+        $('#add').hide()
+      }
+    });
+    $("#timer").timer('pause')
+
+    $('#reset').on('click', function() {
+      $.ajax({
+        method: "get",
+        url: "/home",
+        dataType: "json",
+        // data: {value: value, index: hidden},
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        success: function(data){
+          alert('success')
+          $('#timer').timer('reset');
+          $("#word").text("Your Word");
+          $('#boggle_board td').removeClass('active')
+        },
+        error: function(data){
+          // alert(data.responseJSON.word)
+        },
+        complete: function(){
+          $('#timer').timer('reset');
+          $('#timer').timer('pause');
+          $("#word").text("Your Word");
+          $('#boggle_board td').removeClass('active')
+          $('#start').show()
+          $('#add').hide()
+        }
       });
     })
   });

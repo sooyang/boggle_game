@@ -3,6 +3,7 @@ class HomeController < ApplicationController
 
   def index
     @draw_board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D")
+    # @draw_board = Board.new("A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K")
     @board = @draw_board.draw
     session[:game] =  @draw_board
   end
