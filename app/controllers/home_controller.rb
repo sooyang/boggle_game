@@ -22,9 +22,13 @@ class HomeController < ApplicationController
   def add
     board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D", session[:game]["selected"], session[:game]["indexes"], session[:game]["added"]).add
     if board == "ok"
-      render :json => { :word => "correct"}, :status => 200
+      render :json => { :word => "correct", selected: session[:game]["selected"]}, :status => 200
+      session[:game]["selected"] = []
+      session[:game]["indexes"] = []
     else
-      render :json => { :word => "wrong"}, :status => 400
+      render :json => { :word => "wrong", selected: session[:game]["selected"]}, :status => 400
+      session[:game]["selected"] = []
+      session[:game]["indexes"] = []
     end
   end
 end

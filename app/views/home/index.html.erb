@@ -30,6 +30,14 @@
   <button id="reset" type="button">Reset Game</button>
 </div>
 
+
+
+<table id="correct">
+</table>
+
+<table id="wrong">
+</table>
+
 <div id="timer" />
 
 <script>
@@ -74,9 +82,15 @@
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
         success: function(data){
           alert(data.word)
+          $('#correct').append( ` <tr> <td> ${data.selected.join("")} </td> </tr>`);
+          $("#word").text("")
+          $('#boggle_board td').removeClass('active')
         },
         error: function(data){
-          alert(data.responseJSON.word)
+          // alert(data.responseJSON.word)
+          $('#wrong').append( ` <tr> <td> ${data.responseJSON.selected.join("")} </td> </tr>`);
+          $("#word").text("")
+          $('#boggle_board td').removeClass('active')
         },
         // complete: function(){
         //   alert('successs')
@@ -124,6 +138,8 @@
           $('#boggle_board td').removeClass('active')
           $('#start').show()
           $('#add').hide()
+          $('#wrong').empty()
+          $('#correct').empty()
         }
       });
     })
