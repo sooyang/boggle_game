@@ -23,6 +23,7 @@
   <% end %>
 </table>
 
+<p id="word">Your Word</p>
 <button id="add" type="button">Add Word</button>
 
 
@@ -41,8 +42,11 @@
         success: function(data){
           if (data.word === "removed") {
             selected.removeClass('active')
+            $("#word").text(data.selected.join(""));
+
           } else {
             selected.addClass('active')
+            $("#word").text(data.selected.join(""));
           }
         },
         error: function(data){
