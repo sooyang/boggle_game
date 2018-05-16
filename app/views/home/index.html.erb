@@ -1,59 +1,54 @@
-<h1>Boggle</h1>
-
-<table align="center" id="boggle_board">
-  <%= render 'board', board: @board %>
-</table>
-
-<div>
-  <p id="word">Your Word</p>
-  <button id="add" type="button">Add Word</button>
-  <button id="start" type="button">Start Game</button>
-  <button id="reset" type="button">Reset Game</button>
+<div class="row">
+  <div class="col-12 text-center mt-3 mb-3">
+    <h1>Boggle</h1>
+    <div id="timer"></div>
+  </div>
+  <div class="col-6 col-md-3 order-last order-md-3">
+    <table class="table answer-table" id="wrong-answer-table">
+      <thead>
+        <tr>
+          <th scope="col">Wrong</th>
+        </tr>
+      </thead>
+      <tbody id="wrong-answer-table-body">
+      </tbody>
+    </table>
+  </div>
+  <div class="col-12 col-md-6 order-2 order-md-4">
+    <table id="boggle-board" class="table table-bordered">
+      <%= render 'board', board: @board %>
+    </table>
+  </div>
+  <div class="col-6 col-md-3 order-last order-md-5">
+    <table class="table answer-table" id="correct-answer-table">
+      <thead>
+        <tr>
+          <th scope="col">Correct</th>
+        </tr>
+      </thead>
+      <tbody id="correct-answer-table-body">
+      </tbody>
+    </table>
+  </div>
+  <div class="col-12 text-center order-3 order-md-6">
+    <h3 id="word">Welcome to Boggle</h3>
+  </div>
+  <div class="col-12 text-center order-5 order-md-12 mb-4">
+    <%= button_to "Start Game", start_path, remote: true, method: :get, id: "start", class: 'btn btn-primary'%>
+    <div class="row">
+      <div class="col-6">
+        <button id="add" type="button" class="btn btn-success float-sm-right">Add Word</button>
+      </div>
+      <div class="col-6">
+        <%= button_to "Reset Game",  home_path, remote: true, method: :get, id: "reset", class: 'btn btn-danger float-sm-left'%>
+      </div>
+    </div>
+  </div>
 </div>
-
-
-<%= button_to "Start Game", start_path, remote: true, method: :get %>
-
-<table id="correct">
-</table>
-
-<table id="wrong">
-</table>
-
-<div id="timer" />
 
 <script>
   $(document).ready(function(){
-    $('#boggle_board td').on('click', function(){
-      if($('#timer').data('state') === 'running') {
-        let selected = $(this)
-        let value = $(this).text().trim()
-        let hidden = $(this).find( ":hidden" ).val()
-        $.ajax({
-          method: "post",
-          url: "/select",
-          dataType: "json",
-          data: {value: value, index: hidden},
-          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
-          success: function(data){
-            if (data.word === "removed") {
-              selected.removeClass('active')
-              $("#word").text(data.selected.join(""));
 
-            } else {
-              selected.addClass('active')
-              $("#word").text(data.selected.join(""));
-            }
-          },
-          error: function(data){
-            alert("error selecting")
-          },
-          // complete: function(){
-          //   alert('successs')
-          // }
-        });
-      }
-    })
     $('#add').hide()
     $('#add').on('click', function() {
       $.ajax({
@@ -63,16 +58,16 @@
         // data: {value: value, index: hidden},
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
         success: function(data){
-          alert(data.word)
-          $('#correct').append( ` <tr> <td> ${data.selected.join("")} </td> </tr>`);
+          console.log(data.word)
+          $('#correct-answer-table-body').append( ` <tr> <td> ${data.selected.join("")} </td> </tr>`);
           $("#word").text("")
-          $('#boggle_board td').removeClass('active')
+          $('#boggle-board td').removeClass('active')
         },
         error: function(data){
-          // alert(data.responseJSON.word)
-          $('#wrong').append( ` <tr> <td> ${data.responseJSON.selected.join("")} </td> </tr>`);
+          $('#wrong-answer-table-body').append( ` <tr> <td> ${data.responseJSON.selected.join("")} </td> </tr>`)
+          $("#wrong-answer-table").animate({scrollTop: $("#wrong-answer-table").prop("scrollHeight")});
           $("#word").text("")
-          $('#boggle_board td').removeClass('active')
+          $('#boggle-board td').removeClass('active')
         },
         // complete: function(){
         //   alert('successs')
@@ -80,10 +75,14 @@
       });
     })
 
+    $('#reset').hide();
     $('#start').on('click', function() {
-      $("#timer").timer('resume');
+      $("#timer").timer('reset');
       $('#add').show()
+      $('#reset').show();
       $('#start').hide()
+      $('#wrong-answer-table-body').empty()
+      $('#correct-answer-table-body').empty()
     })
 
     $("#timer").timer({
@@ -92,38 +91,11 @@
       callback: function() {
         alert('Time up!');
         $('#start').show()
+        $("#word").text("Welcome to Boggle");
         $('#add').hide()
+        $('#reset').hide()
       }
     });
     $("#timer").timer('pause')
-
-    $('#reset').on('click', function() {
-      $.ajax({
-        method: "get",
-        url: "/home",
-        dataType: "json",
-        // data: {value: value, index: hidden},
-        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
-        success: function(data){
-          alert('success')
-          $('#timer').timer('reset');
-          $("#word").text("Your Word");
-          $('#boggle_board td').removeClass('active')
-        },
-        error: function(data){
-          // alert(data.responseJSON.word)
-        },
-        complete: function(){
-          $('#timer').timer('reset');
-          $('#timer').timer('pause');
-          $("#word").text("Your Word");
-          $('#boggle_board td').removeClass('active')
-          $('#start').show()
-          $('#add').hide()
-          $('#wrong').empty()
-          $('#correct').empty()
-        }
-      });
-    })
   });
 </script>

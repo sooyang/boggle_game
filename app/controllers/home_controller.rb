@@ -37,7 +37,7 @@ class HomeController < ApplicationController
       session[:game]["selected"] = []
       session[:game]["indexes"] = []
     else
-      render :json => { :word => "wrong", selected: session[:game]["selected"]}, :status => 400
+      render :json => { :word => "wrong", selected: session[:game]["selected"]}, status: :bad_request
       session[:game]["selected"] = []
       session[:game]["indexes"] = []
     end

@@ -41,13 +41,17 @@ module Boggle
     end
 
     def add
-      array = File.readlines("lib/dictionary.txt").grep(/#{@selected.join.downcase}/)
+      word = if @selected.first == '*'
+        @selected.join.downcase.slice(1)
+      else
+        @selected.join.downcase
+      end
+      array = File.readlines("lib/dictionary.txt").grep(/#{word}/)
       if @selected.include?('*')
         new_array = array.map {|b| b if b.gsub("\n", "").length == @selected.length }.compact
         newer_array = new_array.map {|a| a.gsub("\n", "")}
         newest_array = newer_array.map {|x| x.split("").each_with_index.map {|b,i| b == @selected[i].downcase} }
         latest = newest_array.map {|a| a.count(true) == @selected.count - @selected.count("*")}
-
         if latest.count(true) > 0 && @added.count(@selected.join.downcase) < latest.count(true)
           @added << @selected.join.downcase
           return "ok"
@@ -56,9 +60,11 @@ module Boggle
           return "wrong"
         end
       else
-        if array.include?("#{@selected.join.downcase}\n")
+        if array.include?("#{@selected.join.downcase}\n") && @added.count(@selected.join.downcase) < 1
+          @added << @selected.join.downcase
           return "ok"
         else
+          @added << @selected.join.downcase
           return "wrong"
         end
       end

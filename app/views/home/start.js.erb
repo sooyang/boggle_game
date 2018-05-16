@@ -1,1 +1,28 @@
-$('#boggle_board').html("<%= j (render 'board', board: @board) %>");
+$('#boggle-board').html("<%= j (render 'board', board: @board) %>");
+$('#boggle-board td').on('click', function(){
+  if($('#timer').data('state') === 'running') {
+    let selected = $(this)
+    let value = $(this).text().trim()
+    let hidden = $(this).find( ":hidden" ).val()
+    $.ajax({
+      method: "post",
+      url: "/select",
+      dataType: "json",
+      data: {value: value, index: hidden},
+      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+      success: function(data){
+        if (data.word === "removed") {
+          selected.removeClass('active')
+          $("#word").text(data.selected.join(""));
+
+        } else {
+          selected.addClass('active')
+          $("#word").text(data.selected.join(""));
+        }
+      },
+      error: function(data){
+        console.log("error selecting")
+      },
+    });
+  }
+})

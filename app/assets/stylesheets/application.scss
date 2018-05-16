@@ -1,0 +1,37 @@
+@import "bootstrap";
+
+html,
+body {
+  background-color: #fff;
+  height: 100%;
+}
+
+#boggle-board {
+  td {
+    width: 100px;
+    height: 100px;
+    text-align: -webkit-center;
+    font-size: 3em;
+  }
+}
+
+td:hover {
+  background-color: #C8CCFF;
+}
+
+.active {
+  background-color: #95a5a6;
+}
+
+.answer-table {
+  max-height:400px;
+  overflow: auto;
+  display: block;
+  th {
+    width: 300px;
+  }
+}
+
+#word {
+  min-height: 40px
+}
