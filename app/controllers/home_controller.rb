@@ -2,7 +2,18 @@ class HomeController < ApplicationController
   include Boggle
 
   def index
-    @draw_board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D")
+    @draw_board = Board.new(", , , , , , , , , , , , , , , ")
+    # @draw_board = Board.new("A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K")
+    @board = @draw_board.draw
+    session[:game] =  @draw_board
+  end
+
+  def start
+    o = [('A'..'Z')].map(&:to_a).flatten <<  "*"
+    string = (0...16).map { o[rand(o.length)] }.join(", ")
+    # byebug
+    @draw_board = Board.new(string)
+    # @draw_board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D")
     # @draw_board = Board.new("A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K")
     @board = @draw_board.draw
     session[:game] =  @draw_board

@@ -8,7 +8,12 @@ module Boggle
     end
 
     def draw
-      @board.gsub(",", "").gsub(" ", "").chars.each_slice(4).map{|r| r}
+      @board =
+        if @board.gsub(",", "").blank?
+          @board.gsub(",", "").chars.each_slice(4).map{|r| r}
+        else
+          @board.gsub(",", "").gsub(" ", "").chars.each_slice(4).map{|r| r}
+        end
     end
 
     def selected(value, index)

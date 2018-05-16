@@ -1,26 +1,7 @@
 <h1>Boggle</h1>
 
 <table align="center" id="boggle_board">
-  <% @board.each_with_index do |row, index| %>
-    <tr>
-      <td>
-        <%= row[0] %>
-        <input type="hidden" value="<%= index %>,0">
-      </td>
-      <td>
-        <%= row[1] %>
-        <input type="hidden" value="<%= index %>,1">
-      </td>
-      <td>
-        <%= row[2] %>
-        <input type="hidden" value="<%= index %>,2">
-      </td>
-      <td>
-        <%= row[3] %>
-        <input type="hidden" value="<%= index %>,3">
-      </td>
-    </tr>
-  <% end %>
+  <%= render 'board', board: @board %>
 </table>
 
 <div>
@@ -31,6 +12,7 @@
 </div>
 
 
+<%= button_to "Start Game", start_path, remote: true, method: :get %>
 
 <table id="correct">
 </table>

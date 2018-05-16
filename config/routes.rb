@@ -4,4 +4,5 @@ Rails.application.routes.draw do
   get 'home' => 'home#index'
   post 'select' => 'home#select'
   post 'add' => 'home#add'
+  get 'start' => 'home#start'
 end
