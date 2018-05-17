@@ -127,7 +127,6 @@ module Boggle
       if @selected_char.include?('*')
         compared_by_char_position = arr_of_possible_words.map {|word| word.split("").each_with_index.map{|char, i|  @selected_char[i] == "*" ? true : char == @selected_char[i].downcase }}
       else
-        byebug
         compared_by_char_position = arr_of_possible_words.map {|word| word.split("").each_with_index.map{|char, i|  char == "*" ? true : char == @selected_char[i].downcase }}
       end
       # Since wildcards can be from A-Z, we know that the word is true once the number of character and position matches minus the amount of wilcard
