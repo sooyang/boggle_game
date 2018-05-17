@@ -9,20 +9,25 @@ $('#boggle-board td').on('click', function(){
       url: "/select",
       dataType: "json",
       data: {value: value, index: hidden},
-      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
+        $("#boggle-board td").css("pointer-events", "none");
+      },
       success: function(data){
         if (data.action === "removed") {
           selected_char.removeClass('active')
           $("#word-selected").text(data.selected_char.join(""));
-
         } else {
           selected_char.addClass('active')
           $("#word-selected").text(data.selected_char.join(""));
         }
       },
-      error: function(data){
+      error: function(data) {
         console.log("error selecting")
       },
+      complete: function() {
+        $("#boggle-board td").css("pointer-events", "auto");
+      }
     });
   }
 })
