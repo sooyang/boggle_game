@@ -23,4 +23,4 @@ A lot of JavaScript was used to handle the player interaction in the game. Ruby 
 
 Ruby on Rails was also selected for ease in doing rspec testing.
 
-It is worth noting that front-end frameworks such as React can deliver a better user experience for this exercise. It also have the ability to perform unit-testing using Jasmine. Placing time factor as a priority, Ruby on Rails is a winner.
+It is worth noting that front-end frameworks such as React can deliver a better user experience for this exercise. It also have the ability to perform unit-testing using Jasmine. However, placing time factor as a priority, Ruby on Rails is a winner.
