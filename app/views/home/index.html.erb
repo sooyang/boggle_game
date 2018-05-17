@@ -44,10 +44,15 @@
           $('#boggle-board td').removeClass('active')
         },
         error: function(data){
-          $('#wrong-answer-table-body').append( ` <tr> <td> ${data.responseJSON.selected.join("")} </td> </tr>`)
-          $("#wrong-answer-table").animate({scrollTop: $("#wrong-answer-table").prop("scrollHeight")});
-          $("#word-selected").text("")
-          $('#boggle-board td').removeClass('active')
+          if (data.responseJSON.action === "short") {
+            $("#word-selected").text(`"${data.responseJSON.selected.join("")}" is too short`)
+            $('#boggle-board td').removeClass('active')
+          } else {
+            $('#wrong-answer-table-body').append( ` <tr> <td> ${data.responseJSON.selected.join("")} </td> </tr>`)
+            $("#wrong-answer-table").animate({scrollTop: $("#wrong-answer-table").prop("scrollHeight")});
+            $("#word-selected").text("")
+            $('#boggle-board td').removeClass('active')
+          }
         },
       });
     })

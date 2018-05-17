@@ -11,7 +11,7 @@ $('#boggle-board td').on('click', function(){
       data: {value: value, index: hidden},
       beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
       success: function(data){
-        if (data.word === "removed") {
+        if (data.action === "removed") {
           selected.removeClass('active')
           $("#word-selected").text(data.selected.join(""));
 

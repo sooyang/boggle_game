@@ -1,10 +1,13 @@
 module Boggle
   class Board
-    def initialize(board, selected = [], indexes = [], added = [])
+    def initialize(board = ", , , , , , , , , , , , , , , ")
       @board = board
-      @selected = selected
-      @indexes = indexes
-      @added = added
+    end
+
+    def generate_board
+      characters = [('A'..'Z')].map(&:to_a).flatten <<  "*"
+      @board = (0...16).map { characters[rand(characters.length)] }.join(", ")
+      draw
     end
 
     def draw
@@ -14,6 +17,14 @@ module Boggle
         else
           @board.gsub(",", "").gsub(" ", "").chars.each_slice(4).map{|r| r}
         end
+    end
+  end
+
+  class Game
+    def initialize(selected = [], indexes = [], added = [])
+      @selected = selected
+      @indexes = indexes
+      @added = added
     end
 
     def selected(value, index)
@@ -39,6 +50,7 @@ module Boggle
     end
 
     def add
+      return "short" if @selected.count < 3
       word = if @selected.first == '*'
         @selected.join.downcase.slice(1)
       else

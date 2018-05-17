@@ -1,46 +1,60 @@
 class HomeController < ApplicationController
   include Boggle
 
-  def index
-    @draw_board = Board.new(", , , , , , , , , , , , , , , ")
-    @board = @draw_board.draw
+  before_action :set_board, only: [:index, :start]
+  before_action :set_game, only: [:start]
+  before_action :current_game, only: [:select, :add]
 
-    session[:game] =  @draw_board
-    byebug
+  def index
+    @board = @new_board.draw
+    new_boggle_session
   end
 
   def start
-    o = [('A'..'Z')].map(&:to_a).flatten <<  "*"
-    string = (0...16).map { o[rand(o.length)] }.join(", ")
-
-    @draw_board = Board.new(string)
-    @board = @draw_board.draw
-    session[:game] =  @draw_board
+    @board = @new_board.generate_board
+    new_boggle_session
   end
 
   def select
-    board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D", session[:game]["selected"], session[:game]["indexes"], session[:game]["added"]).selected(params["value"], params["index"])
-    if board == "ok"
-      render :json => { :selected => session[:game]["selected"]}, :status => 200
-    elsif board == "removed"
-      render :json => { :word => "removed", :selected => session[:game]["selected"]}, :status => 200
+    response = @current_game.selected(params["value"], params["index"])
+    if response == "ok"
+      render json: { selected: session[:game]["selected"]}, status: 200
+    elsif response == "removed"
+      render json: { action: "removed", selected: session[:game]["selected"]}, status: 200
     else
-      render :json => { :word => "error "}, :status => 400
+      render json: { action: "error"}, status: 400
     end
   end
 
   def add
-    board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D", session[:game]["selected"], session[:game]["indexes"], session[:game]["added"]).add
-    if board == "ok"
-      render :json => { :word => "correct", selected: session[:game]["selected"]}, :status => 200
-      session[:game]["selected"] = []
-      session[:game]["indexes"] = []
+    response = @current_game.add
+    if response == "ok"
+      render :json => { action: "correct", selected: session[:game]["selected"]}, status: 200
+    elsif response == "short"
+      render :json => { action: "short", selected: session[:game]["selected"]}, status: :bad_request
     else
-      render :json => { :word => "wrong", selected: session[:game]["selected"]}, status: :bad_request
-      session[:game]["selected"] = []
-      session[:game]["indexes"] = []
+      render :json => { action: "wrong", selected: session[:game]["selected"]}, status: :bad_request
     end
+    session[:game]["selected"] = []
+    session[:game]["indexes"] = []
   end
 
   private
+
+  def set_board
+    @new_board = Board.new
+  end
+
+  def set_game
+    @new_game = Game.new
+  end
+
+  def current_game
+    @current_game = Game.new(session[:game]["selected"], session[:game]["indexes"], session[:game]["added"])
+  end
+
+  def new_boggle_session
+    session[:board] = @board
+    session[:game] = @new_game
+  end
 end
