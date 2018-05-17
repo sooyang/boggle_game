@@ -42,11 +42,7 @@ module Boggle
 
       check_with_dictionary
 
-      if @selected_char.include?('*')
-        evaluate_word_with_wildcard
-      else
-        evaluate_word_without_wildcard
-      end
+      evaluate_word
     end
 
     private
@@ -92,39 +88,49 @@ module Boggle
     end
 
     def check_with_dictionary
-      selected_word = if @selected_char.first == '*'
-        @selected_char.join.downcase.slice(1)
+      if @selected_char.first == '*'
+        selected_word = @selected_char.join.downcase.slice(1)
       else
-        @selected_char.join.downcase
+        arr = []
+        @selected_char.each_with_index do |char, i|
+          if char == "*"
+            break
+          elsif @selected_char.count - 1 == i
+            break
+          else
+            arr << char
+          end
+        end
+        selected_word = arr.join.downcase
       end
 
       # Read dictionary with the word formed
       @list_of_words = File.readlines("lib/dictionary.txt").grep(/#{selected_word}/)
     end
 
-    def evaluate_word_without_wildcard
-      selected_char = @selected_char.join.downcase
+    def evaluate_word
+      # Only take words with equal length to the selected char by player
+      filter_by_word_length = @list_of_words.map {|word| word.gsub("\n", "") if word.gsub("\n", "").length == @selected_char.length }.compact
 
-      # Check if selected word is in the dictionary list and have not been added by the player
-      valid_word = @list_of_words.include?("#{selected_char}\n") && @words_added.count(selected_char) < 1
+      possible_words = list_of_correct_words(filter_by_word_length)
+
+      words_used = list_of_correct_words(@words_added)
+
+      # the number of possible words must be more than 0 and words added for actual word and words with wildcard must be less than the number of possible words
+      valid_word = possible_words.count(true) > 0 && words_used.count(true) < possible_words.count(true)
       populate_words_added(@selected_char)
       valid_word ? "ok" : "wrong"
     end
 
-    def evaluate_word_with_wildcard
-      # Only take words with equal length to the selected char by player
-      filter_by_word_length = @list_of_words.map {|word| word.gsub("\n", "") if word.gsub("\n", "").length == @selected_char.length }.compact
-
+    def list_of_correct_words(arr_of_possible_words)
       # Compare the position of each character with the selected char by player
-      filter_by_char_position = filter_by_word_length.map {|x| x.split("").each_with_index.map {|b,i| b == @selected_char[i].downcase} }
-
+      if @selected_char.include?('*')
+        compared_by_char_position = arr_of_possible_words.map {|word| word.split("").each_with_index.map{|char, i|  @selected_char[i] == "*" ? true : char == @selected_char[i].downcase }}
+      else
+        compared_by_char_position = arr_of_possible_words.map {|word| word.split("").each_with_index.map{|char, i|  char == "*" ? true : char == @selected_char[i].downcase }}
+      end
       # Since wildcards can be from A-Z, we know that the word is true once the number of character and position matches minus the amount of wilcard
-      possible_words = filter_by_char_position.map {|a| a.count(true) == @selected_char.count - @selected_char.count("*")}
-
-      # the number of possible words must be more than 0 and words added must be less than the number of possible words
-      valid_word = possible_words.count(true) > 0 && @words_added.count(@selected_char.join.downcase) < possible_words.count(true)
-      populate_words_added(@selected_char)
-      valid_word ? "ok" : "wrong"
+      compared_by_char_position.map {|x| x.count(true) == @selected_char.count}
     end
   end
 end
