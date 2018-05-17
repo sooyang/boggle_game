@@ -1,7 +1,7 @@
 $('#boggle-board').html("<%= j (render 'partials/board', board: @board) %>");
 $('#boggle-board td').on('click', function(){
   if ($('#timer').data('state') === 'running') {
-    let selected = $(this)
+    let selected_char = $(this)
     let value = $(this).text().trim()
     let hidden = $(this).find( ":hidden" ).val()
     $.ajax({
@@ -12,12 +12,12 @@ $('#boggle-board td').on('click', function(){
       beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
       success: function(data){
         if (data.action === "removed") {
-          selected.removeClass('active')
-          $("#word-selected").text(data.selected.join(""));
+          selected_char.removeClass('active')
+          $("#word-selected").text(data.selected_char.join(""));
 
         } else {
-          selected.addClass('active')
-          $("#word-selected").text(data.selected.join(""));
+          selected_char.addClass('active')
+          $("#word-selected").text(data.selected_char.join(""));
         }
       },
       error: function(data){

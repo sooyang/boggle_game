@@ -11,73 +11,120 @@ module Boggle
     end
 
     def draw
+      board_string = @board.gsub(",", "")
       @board =
-        if @board.gsub(",", "").blank?
-          @board.gsub(",", "").chars.each_slice(4).map{|r| r}
+        if board_string.blank?
+          board_string.chars.each_slice(4).map{|r| r}
         else
-          @board.gsub(",", "").gsub(" ", "").chars.each_slice(4).map{|r| r}
+          board_string.gsub(" ", "").chars.each_slice(4).map{|r| r}
         end
     end
   end
 
   class Game
-    def initialize(selected = [], indexes = [], added = [])
-      @selected = selected
+    def initialize(selected_char = [], indexes = [], words_added = [])
+      @selected_char = selected_char
       @indexes = indexes
-      @added = added
+      @words_added = words_added
     end
 
-    def selected(value, index)
-      if @selected.last
-        if @selected.last == value && @indexes.last == index
-          @selected.pop()
-          @indexes.pop()
-          return 'removed'
-        else
-          if index.first.to_i.between?(@indexes.last.first.to_i - 1, @indexes.last.first.to_i + 1) && index.last.to_i.between?(@indexes.last.last.to_i - 1, @indexes.last.last.to_i + 1) && !@indexes.include?(index)
-            @selected << value
-            @indexes << index
-            return "ok"
-          else
-            return "error"
-          end
-        end
+    def select_char(value, index)
+      if @selected_char.empty?
+        populate_selected_char(value, index)
       else
-        @selected << value
-        @indexes << index
-        return "ok"
+        check_previous_selection(value, index)
       end
     end
 
     def add
-      return "short" if @selected.count < 3
-      word = if @selected.first == '*'
-        @selected.join.downcase.slice(1)
+      # Minimum 3 characters to form a word
+      return "short" if @selected_char.count < 3
+
+      check_with_dictionary
+
+      if @selected_char.include?('*')
+        evaluate_word_with_wildcard
       else
-        @selected.join.downcase
+        evaluate_word_without_wildcard
       end
-      array = File.readlines("lib/dictionary.txt").grep(/#{word}/)
-      if @selected.include?('*')
-        new_array = array.map {|b| b if b.gsub("\n", "").length == @selected.length }.compact
-        newer_array = new_array.map {|a| a.gsub("\n", "")}
-        newest_array = newer_array.map {|x| x.split("").each_with_index.map {|b,i| b == @selected[i].downcase} }
-        latest = newest_array.map {|a| a.count(true) == @selected.count - @selected.count("*")}
-        if latest.count(true) > 0 && @added.count(@selected.join.downcase) < latest.count(true)
-          @added << @selected.join.downcase
-          return "ok"
-        else
-          @added << @selected.join.downcase
-          return "wrong"
-        end
+    end
+
+    private
+
+    def populate_selected_char(value, index)
+      @selected_char << value
+      @indexes << index
+      return "ok"
+    end
+
+    def populate_words_added(word)
+      @words_added << word.join.downcase
+    end
+
+    def check_previous_selection(value, index)
+      # if previously selected, clicking again indicates user intent to remove selection
+      if @selected_char.last == value && @indexes.last == index
+        @selected_char.pop()
+        @indexes.pop()
+        return 'removed'
       else
-        if array.include?("#{@selected.join.downcase}\n") && @added.count(@selected.join.downcase) < 1
-          @added << @selected.join.downcase
-          return "ok"
-        else
-          @added << @selected.join.downcase
-          return "wrong"
-        end
+        check_adjacent_selection(value, index)
       end
+    end
+
+    def check_adjacent_selection(value, index)
+      # Rule for checking
+      # i) from current tile, index x +- 1
+      # ii) from current tile, index y +- 1
+      # iii) Cannot be one of previously selected index
+      selected_xindex = index.first.to_i
+      selected_yindex = index.last.to_i
+      current_xindex = @indexes.last.first.to_i
+      current_yindex = @indexes.last.last.to_i
+
+      if selected_xindex.between?(current_xindex - 1, current_xindex + 1) &&
+        selected_yindex.between?(current_yindex - 1, current_yindex + 1) &&
+        !@indexes.include?(index)
+        populate_selected_char(value, index)
+      else
+        return "error"
+      end
+    end
+
+    def check_with_dictionary
+      selected_word = if @selected_char.first == '*'
+        @selected_char.join.downcase.slice(1)
+      else
+        @selected_char.join.downcase
+      end
+
+      # Read dictionary with the word formed
+      @list_of_words = File.readlines("lib/dictionary.txt").grep(/#{selected_word}/)
+    end
+
+    def evaluate_word_without_wildcard
+      selected_char = @selected_char.join.downcase
+
+      # Check if selected word is in the dictionary list and have not been added by the player
+      valid_word = @list_of_words.include?("#{selected_char}\n") && @words_added.count(selected_char) < 1
+      populate_words_added(@selected_char)
+      valid_word ? "ok" : "wrong"
+    end
+
+    def evaluate_word_with_wildcard
+      # Only take words with equal length to the selected char by player
+      filter_by_word_length = @list_of_words.map {|word| word.gsub("\n", "") if word.gsub("\n", "").length == @selected_char.length }.compact
+
+      # Compare the position of each character with the selected char by player
+      filter_by_char_position = filter_by_word_length.map {|x| x.split("").each_with_index.map {|b,i| b == @selected_char[i].downcase} }
+
+      # Since wildcards can be from A-Z, we know that the word is true once the number of character and position matches minus the amount of wilcard
+      possible_words = filter_by_char_position.map {|a| a.count(true) == @selected_char.count - @selected_char.count("*")}
+
+      # the number of possible words must be more than 0 and words added must be less than the number of possible words
+      valid_word = possible_words.count(true) > 0 && @words_added.count(@selected_char.join.downcase) < possible_words.count(true)
+      populate_words_added(@selected_char)
+      valid_word ? "ok" : "wrong"
     end
   end
 end
