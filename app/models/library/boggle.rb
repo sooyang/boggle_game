@@ -111,10 +111,10 @@ module Boggle
     def evaluate_word
       # Only take words with equal length to the selected char by player
       filter_by_word_length = @list_of_words.map {|word| word.gsub("\n", "") if word.gsub("\n", "").length == @selected_char.length }.compact
-
       possible_words = list_of_correct_words(filter_by_word_length)
 
-      words_used = list_of_correct_words(@words_added)
+      filtered_words_added_by_length = @words_added.map {|word| word if word.length == @selected_char.length }.compact
+      words_used = list_of_correct_words(filtered_words_added_by_length)
 
       # the number of possible words must be more than 0 and words added for actual word and words with wildcard must be less than the number of possible words
       valid_word = possible_words.count(true) > 0 && words_used.count(true) < possible_words.count(true)
@@ -127,6 +127,7 @@ module Boggle
       if @selected_char.include?('*')
         compared_by_char_position = arr_of_possible_words.map {|word| word.split("").each_with_index.map{|char, i|  @selected_char[i] == "*" ? true : char == @selected_char[i].downcase }}
       else
+        byebug
         compared_by_char_position = arr_of_possible_words.map {|word| word.split("").each_with_index.map{|char, i|  char == "*" ? true : char == @selected_char[i].downcase }}
       end
       # Since wildcards can be from A-Z, we know that the word is true once the number of character and position matches minus the amount of wilcard
