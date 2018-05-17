@@ -26,9 +26,9 @@ class GameController < ApplicationController
     if response == "ok"
       render :json => { action: "correct", selected_char: session[:game]["selected_char"]}, status: 200
     elsif response == "short"
-      render :json => { action: "short", selected_char: session[:game]["selected_char"]}, status: :bad_request
+      render :json => { action: "short", selected_char: session[:game]["selected_char"]}, status: 200
     else
-      render :json => { action: "wrong", selected_char: session[:game]["selected_char"]}, status: :bad_request
+      render :json => { action: "wrong", selected_char: session[:game]["selected_char"]}, status: 200
     end
     session[:game]["selected_char"] = []
     session[:game]["indexes"] = []
