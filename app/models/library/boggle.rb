@@ -17,14 +17,12 @@ module Boggle
     end
 
     def selected(value, index)
-      # byebug
       if @selected.last
         if @selected.last == value && @indexes.last == index
           @selected.pop()
           @indexes.pop()
           return 'removed'
         else
-          # byebug
           if index.first.to_i.between?(@indexes.last.first.to_i - 1, @indexes.last.first.to_i + 1) && index.last.to_i.between?(@indexes.last.last.to_i - 1, @indexes.last.last.to_i + 1) && !@indexes.include?(index)
             @selected << value
             @indexes << index

@@ -1,0 +1,22 @@
+<table id="boggle-board" class="table table-bordered">
+  <% board.each_with_index do |row, index| %>
+    <tr>
+      <td>
+        <%= row[0] %>
+        <input type="hidden" value="<%= index %>,0">
+      </td>
+      <td>
+        <%= row[1] %>
+        <input type="hidden" value="<%= index %>,1">
+      </td>
+      <td>
+        <%= row[2] %>
+        <input type="hidden" value="<%= index %>,2">
+      </td>
+      <td>
+        <%= row[3] %>
+        <input type="hidden" value="<%= index %>,3">
+      </td>
+    </tr>
+  <% end %>
+</table>

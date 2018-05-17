@@ -1,10 +1,10 @@
-$('#boggle-board').html("<%= j (render 'board', board: @board) %>");
+$('#boggle-board').html("<%= j (render 'partials/board', board: @board) %>");
 $('#timer').timer('reset');
 $('#timer').timer('pause');
-$("#word").text("Welcome to Boggle");
+$("#word-selected").text("Welcome to Boggle");
 $('#boggle-board td').removeClass('active')
-$('#start').show()
-$('#add').hide()
-$('#reset').hide()
+$('#start-game').show()
+$('#add-word').hide()
+$('#reset-game').hide()
 $('#wrong-answer-table-body').empty()
 $('#correct-answer-table-body').empty()

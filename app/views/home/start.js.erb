@@ -1,6 +1,6 @@
-$('#boggle-board').html("<%= j (render 'board', board: @board) %>");
+$('#boggle-board').html("<%= j (render 'partials/board', board: @board) %>");
 $('#boggle-board td').on('click', function(){
-  if($('#timer').data('state') === 'running') {
+  if ($('#timer').data('state') === 'running') {
     let selected = $(this)
     let value = $(this).text().trim()
     let hidden = $(this).find( ":hidden" ).val()
@@ -13,11 +13,11 @@ $('#boggle-board td').on('click', function(){
       success: function(data){
         if (data.word === "removed") {
           selected.removeClass('active')
-          $("#word").text(data.selected.join(""));
+          $("#word-selected").text(data.selected.join(""));
 
         } else {
           selected.addClass('active')
-          $("#word").text(data.selected.join(""));
+          $("#word-selected").text(data.selected.join(""));
         }
       },
       error: function(data){

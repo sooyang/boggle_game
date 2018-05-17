@@ -3,18 +3,17 @@ class HomeController < ApplicationController
 
   def index
     @draw_board = Board.new(", , , , , , , , , , , , , , , ")
-    # @draw_board = Board.new("A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K")
     @board = @draw_board.draw
+
     session[:game] =  @draw_board
+    byebug
   end
 
   def start
     o = [('A'..'Z')].map(&:to_a).flatten <<  "*"
     string = (0...16).map { o[rand(o.length)] }.join(", ")
-    # byebug
+
     @draw_board = Board.new(string)
-    # @draw_board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D")
-    # @draw_board = Board.new("A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K")
     @board = @draw_board.draw
     session[:game] =  @draw_board
   end
@@ -22,11 +21,11 @@ class HomeController < ApplicationController
   def select
     board = Board.new("T, A, P, *, E, A, K, S, O, B, R, S, S, *, X, D", session[:game]["selected"], session[:game]["indexes"], session[:game]["added"]).selected(params["value"], params["index"])
     if board == "ok"
-      render :json => { :word => "masquerade_word ", :selected => session[:game]["selected"]}, :status => 200
+      render :json => { :selected => session[:game]["selected"]}, :status => 200
     elsif board == "removed"
       render :json => { :word => "removed", :selected => session[:game]["selected"]}, :status => 200
     else
-      render :json => { :word => "masquerade_word "}, :status => 400
+      render :json => { :word => "error "}, :status => 400
     end
   end
 
@@ -42,4 +41,6 @@ class HomeController < ApplicationController
       session[:game]["indexes"] = []
     end
   end
+
+  private
 end

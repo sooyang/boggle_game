@@ -1,8 +1,12 @@
 @import "bootstrap";
 
+$white: #fff;
+$purple: #c8ccff;
+$gray: #95a5a6;
+
 html,
 body {
-  background-color: #fff;
+  background-color: $white;
   height: 100%;
 }
 
@@ -16,11 +20,11 @@ body {
 }
 
 td:hover {
-  background-color: #C8CCFF;
+  background-color: $purple;
 }
 
 .active {
-  background-color: #95a5a6;
+  background-color: $gray;
 }
 
 .answer-table {
@@ -32,6 +36,10 @@ td:hover {
   }
 }
 
-#word {
-  min-height: 40px
+#word-selected {
+  min-height: 40px;
+}
+
+#add-word, #reset-game {
+  display: none;
 }
