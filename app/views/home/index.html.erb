@@ -42,7 +42,7 @@
             $('#boggle-board td').removeClass('active')
           } else if ( data.action === "correct" ) {
             $('#correct-answer-table-body').append( ` <tr> <td> ${data.selected_char.join("")} </td> </tr>`);
-            $("#correct-answer-table").animate({scrollTop: $("#wrong-answer-table").prop("scrollHeight")});
+            $("#correct-answer-table").animate({scrollTop: $("#correct-answer-table").prop("scrollHeight")});
             $("#word-selected").text("")
             $('#boggle-board td').removeClass('active')
           } else {
