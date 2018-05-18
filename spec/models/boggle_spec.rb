@@ -145,13 +145,22 @@ RSpec.describe Boggle::Game do
     let(:wrong_word_with_wildcard) { Boggle::Game.new(["D", "D", "*"], ["0,0", "0,1", "0,2"]) }
 
     context "short text" do
-      it "returns short" do
+      before do |example|
+        unless example.metadata[:skip_before]
+          short.add
+        end
+      end
+
+      it "returns short", skip_before: true do
         expect(short.add).to eq("short")
       end
 
       it "does not add the word to words added array" do
-        short.add
         expect(short.instance_values["words_added"]).to_not eq(["AB"])
+      end
+
+      it "does not add to score" do
+        expect(short.instance_values["scores"]).to_not eq([1])
       end
     end
 
@@ -162,8 +171,15 @@ RSpec.describe Boggle::Game do
         end
 
         it "adds the word to words added array" do
-          correct_word_with_wildcard.add
-          expect(correct_word_with_wildcard.instance_values["words_added"]).to include ("COD*".downcase)
+          expect do
+            correct_word_with_wildcard.add
+          end.to change { correct_word_with_wildcard.instance_values["words_added"] }.from([]).to(["cod*"])
+        end
+
+        it "adds to score" do
+          expect do
+            correct_word_with_wildcard.add
+          end.to change { correct_word_with_wildcard.instance_values["scores"] }.from([]).to([1])
         end
       end
 
@@ -173,9 +189,15 @@ RSpec.describe Boggle::Game do
         end
 
         it "adds the word to words added array" do
-          wrong_word_with_wildcard.add
+          expect do
+            wrong_word_with_wildcard.add
+          end.to change { wrong_word_with_wildcard.instance_values["words_added"] }.from([]).to(["dd*"])
+        end
 
-          expect(wrong_word_with_wildcard.instance_values["words_added"]).to include ("DD*".downcase)
+        it "adds to score" do
+          expect do
+            wrong_word_with_wildcard.add
+          end.to change { wrong_word_with_wildcard.instance_values["scores"] }.from([]).to([-1])
         end
       end
     end
@@ -187,8 +209,15 @@ RSpec.describe Boggle::Game do
         end
 
         it "adds the word to words added array" do
-          correct_word_without_wildcard.add
-          expect(correct_word_without_wildcard.instance_values["words_added"]).to include ("CODE".downcase)
+          expect do
+            correct_word_without_wildcard.add
+          end.to change { correct_word_without_wildcard.instance_values["words_added"] }.from([]).to(["code"])
+        end
+
+        it "adds to score" do
+          expect do
+            correct_word_without_wildcard.add
+          end.to change { correct_word_without_wildcard.instance_values["scores"] }.from([]).to([1])
         end
       end
 
@@ -198,9 +227,15 @@ RSpec.describe Boggle::Game do
         end
 
         it "adds the word to words added array" do
-          wrong_word_without_wildcard.add
+          expect do
+            wrong_word_without_wildcard.add
+          end.to change { wrong_word_without_wildcard.instance_values["words_added"] }.from([]).to(["asd"])
+        end
 
-          expect(wrong_word_without_wildcard.instance_values["words_added"]).to include ("ASD".downcase)
+        it "adds to score" do
+          expect do
+            wrong_word_without_wildcard.add
+          end.to change { wrong_word_without_wildcard.instance_values["scores"] }.from([]).to([-1])
         end
       end
     end

@@ -1,7 +1,8 @@
 <div class="row">
-  <div class="col-12 text-center mt-3 mb-3">
+  <div class="col-12 text-center mt-3">
     <h1>Boggle</h1>
     <div id="timer"></div>
+    <p class="d-inline">Score: <p id="score" class="d-inline">0</p></p>
   </div>
   <div class="col-6 col-md-3 order-last order-md-3">
     <%= render 'partials/answer_table', type: "wrong" %>
@@ -43,11 +44,13 @@
           } else if ( data.action === "correct" ) {
             $('#correct-answer-table-body').append( ` <tr> <td> ${data.selected_char.join("")} </td> </tr>`);
             $("#correct-answer-table").animate({scrollTop: $("#correct-answer-table").prop("scrollHeight")});
+            $("#score").text(data.score)
             $("#word-selected").text("")
             $('#boggle-board td').removeClass('active')
           } else {
             $('#wrong-answer-table-body').append( ` <tr> <td> ${data.selected_char.join("")} </td> </tr>`)
             $("#wrong-answer-table").animate({scrollTop: $("#wrong-answer-table").prop("scrollHeight")});
+            $("#score").text(data.score)
             $("#word-selected").text("")
             $('#boggle-board td').removeClass('active')
           }
@@ -60,11 +63,12 @@
 
     $('#start-game').on('click', function() {
       $("#timer").timer('reset');
-      $('#add-word').show()
+      $('#add-word').show();
       $('#reset-game').show();
-      $('#start-game').hide()
-      $('#wrong-answer-table-body').empty()
-      $('#correct-answer-table-body').empty()
+      $("#score").text(0);
+      $('#start-game').hide();
+      $('#wrong-answer-table-body').empty();
+      $('#correct-answer-table-body').empty();
     })
 
     $("#timer").timer({

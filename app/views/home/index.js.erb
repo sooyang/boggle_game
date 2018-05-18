@@ -2,6 +2,7 @@ $('#boggle-board').html("<%= j (render 'partials/board', board: @board) %>");
 $('#timer').timer('reset');
 $('#timer').timer('pause');
 $("#word-selected").text("Welcome to Boggle");
+$("#score").text(0)
 $('#boggle-board td').removeClass('active')
 $('#start-game').show()
 $('#add-word').hide()

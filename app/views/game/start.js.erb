@@ -31,3 +31,14 @@ $('#boggle-board td').on('click', function(){
     });
   }
 })
+$("#timer").timer({
+  countdown: true,
+  duration: '3m',
+  callback: function() {
+    alert("Time's up!");
+    $('#start-game').show()
+    $("#word-selected").text("Welcome to Boggle");
+    $('#add-word').hide()
+    $('#reset-game').hide()
+  }
+});
